@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Design Agent Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 设计系统 - 受 Vercel、Linear、Raycast 启发 */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-elevated: #1f1f1f;
+            --bg-hover: #2a2a2a;
+            --bg-active: #333333;
+
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #6b6b6b;
+            --text-accent: #ffffff;
+
+            --border-primary: #2a2a2a;
+            --border-secondary: #333333;
+            --border-accent: #444444;
+
+            --accent-primary: #007aff;
+            --accent-secondary: #5e5ce6;
+            --accent-success: #30d158;
+            --accent-warning: #ff9f0a;
+            --accent-error: #ff453a;
+
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-primary);
+            z-index: 100;
+            padding: var(--space-md) 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color var(--transition-fast);
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 1px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* 命令面板按钮 */
+        .command-button {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .command-button:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--border-accent);
+            color: var(--text-primary);
+        }
+
+        .command-shortcut {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-family: var(--font-mono);
+        }
+
+        /* 主要内容区域 */
+        main {
+            margin-top: 80px;
+            padding: var(--space-xl) 0;
+        }
+
+        /* 页面标题区域 */
+        .page-header {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin-bottom: var(--space-xl);
+        }
+
+        /* 搜索和过滤区域 */
+        .search-section {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-lg) var(--space-md) 48px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: var(--font-sans);
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-accent);
+            background-color: var(--bg-elevated);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-lg);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .filter-chip {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-chip:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--border-accent);
+            color: var(--text-primary);
+        }
+
+        .filter-chip.active {
+            background-color: var(--bg-active);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* 技能网格 */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-3xl);
+        }
+
+        /* 技能卡片 */
+        .skill-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .skill-card:hover::before {
+            opacity: 1;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .skill-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .skill-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+
+        .status-active {
+            background-color: rgba(48, 209, 88, 0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+
+        .status-beta {
+            background-color: rgba(255, 159, 10, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid rgba(255, 159, 10, 0.3);
+        }
+
+        .status-experimental {
+            background-color: rgba(94, 92, 230, 0.1);
+            color: var(--accent-secondary);
+            border: 1px solid rgba(94, 92, 230, 0.3);
+        }
+
+        .skill-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: var(--space-lg);
+        }
+
+        .skill-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .meta-tag {
+            background-color: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            letter-spacing: 0.3px;
+        }
+
+        .meta-tag.workflow {
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .meta-tag.automation {
+            background-color: rgba(30, 215, 96, 0.1);
+            color: #1ed760;
+        }
+
+        .meta-tag.tool {
+            background-color: rgba(255, 69, 58, 0.1);
+            color: var(--accent-error);
+        }
+
+        .skill-details {
+            border-top: 1px solid var(--border-primary);
+            padding-top: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        .detail-section {
+            margin-bottom: var(--space-md);
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .detail-content {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .keyword {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+        }
+
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        .tool-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background-color: var(--accent-primary);
+        }
+
+        .steps-list {
+            list-style-type: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xs);
+        }
+
+        .step-number {
+            background-color: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .skill-actions {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .action-button {
+            flex: 1;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-primary);
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--border-accent);
+        }
+
+        .action-button.primary {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .action-button.primary:hover {
+            background-color: #0066cc;
+            border-color: #0066cc;
+        }
+
+        /* 页脚 */
+        .page-footer {
+            border-top: 1px solid var(--border-primary);
+            padding: var(--space-xl) 0;
+            margin-top: var(--space-3xl);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .footer-link {
+            color: var(--text-tertiary);
+            font-size: 13px;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-link:hover {
+            color: var(--text-secondary);
+        }
+
+        .footer-copyright {
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .skills-grid {
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 36px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 var(--space-md);
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .skill-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* 微交互效果 */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* 命令面板样式 */
+        .command-palette {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            width: 90%;
+            max-width: 640px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-slow);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .command-palette.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .command-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: var(--font-sans);
+            outline: none;
+        }
+
+        .command-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .command-shortcut-command {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-family: var(--font-mono);
+        }
+
+        .command-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .command-item {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            transition: background-color var(--transition-fast);
+        }
+
+        .command-item:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-item-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .command-item-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-slow);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <span>AI Design</span>
+                <span class="logo-badge">Agent</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#" class="nav-link active">Skills</a>
+                <a href="#" class="nav-link">Workflows</a>
+                <a href="#" class="nav-link">Documentation</a>
+                <a href="#" class="nav-link">Plugins</a>
+                <a href="#" class="nav-link">Community</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="command-button" id="commandButton">
+                    <span>Search skills...</span>
+                    <span class="command-shortcut">⌘K</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main>
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1 class="page-title">AI Design Agent Skills</h1>
+                <p class="page-subtitle">
+                    A curated collection of AI-powered design workflow skills for modern product teams.
+                    Explore, integrate, and automate design processes with intelligent agents.
+                </p>
+            </div>
+
+            <!-- 搜索和过滤 -->
+            <div class="search-section">
+                <div class="search-container">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" class="search-input" placeholder="Search skills by name, description, or keywords...">
+                </div>
+
+                <div class="filters-container">
+                    <div class="filter-chip active">All Skills</div>
+                    <div class="filter-chip">UI/UX</div>
+                    <div class="filter-chip">Prototyping</div>
+                    <div class="filter-chip">Design Systems</div>
+                    <div class="filter-chip">Accessibility</div>
+                    <div class="filter-chip">Automation</div>
+                    <div class="filter-chip">Analysis</div>
+                    <div class="filter-chip">Generation</div>
+                </div>
+            </div>
+
+            <!-- 技能网格 -->
+            <div class="skills-grid" id="skillsGrid">
+                <!-- 技能卡片将通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="page-footer">
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Documentation</a>
+                <a href="#" class="footer-link">API Reference</a>
+                <a href="#" class="footer-link">GitHub</a>
+                <a href="#" class="footer-link">Twitter</a>
+                <a href="#" class="footer-link">Discord</a>
+            </div>
+            <div class="footer-copyright">
+                © 2024 AI Design Agent. Inspired by Vercel, Linear, Raycast, and modern developer tools.
+            </div>
+        </div>
+    </footer>
+
+    <!-- 命令面板 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="command-palette" id="commandPalette">
+        <div class="command-header">
+            <div>🔍</div>
+            <input type="text" class="command-input" placeholder="Type a command or search...">
+            <div class="command-shortcut-command">ESC</div>
+        </div>
+        <div class="command-results">
+            <div class="command-item">
+                <div class="command-item-title">Toggle Dark Mode</div>
+                <div class="command-item-description">Switch between light and dark theme</div>
+            </div>
+            <div class="command-item">
+                <div class="command-item-title">Filter by Workflow</div>
+                <div class="command-item-description">Show only automation workflow skills</div>
+            </div>
+            <div class="command-item">
+                <div class="command-item-title">Sort by Status</div>
+                <div class="command-item-description">Organize skills by active, beta, experimental</div>
+            </div>
+            <div class="command-item">
+                <div class="command-item-title">View Documentation</div>
+                <div class="command-item-description">Open the full documentation site</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 技能数据
+        const skillsData = [
+            {
+                id: 1,
+                name: "UI Audit Agent",
+                description: "Automatically analyzes UI designs for consistency, accessibility, and usability issues. Provides actionable recommendations with severity levels.",
+                status: "active",
+                tags: ["UI Analysis", "Accessibility", "Consistency"],
+                workflow: "Analysis",
+                automation: "Full Automation",
+                tools: ["Figma API", "WCAG Scanner", "Design Linter"],
+                keywords: ["audit", "accessibility", "consistency", "usability", "WCAG", "contrast", "spacing"],
+                steps: [
+                    "Upload design file or provide URL",
+                    "AI analyzes visual hierarchy and consistency",
+                    "Accessibility compliance check",
+                    "Generate detailed report with fixes"
+                ]
+            },
+            {
+                id: 2,
+                name: "Figma Cleanup",
+                description: "Intelligent organization of Figma files: layer naming, grouping, component creation, and style consolidation.",
+                status: "active",
+                tags: ["Figma", "Organization", "Components"],
+                workflow: "Cleanup",
+                automation: "Semi-Automated",
+                tools: ["Figma API", "Design Token Parser"],
+                keywords: ["figma", "cleanup", "organization", "layers", "components", "styles"],
+                steps: [
+                    "Connect to Figma file",
+                    "Analyze current structure",
+                    "Suggest organizational improvements",
+                    "Apply changes with approval"
+                ]
+            },
+            {
+                id: 3,
+                name: "UX Flow Analyzer",
+                description: "Evaluates user flow diagrams for completeness, friction points, and optimization opportunities using cognitive walkthrough simulation.",
+                status: "beta",
+                tags: ["UX", "User Flows", "Optimization"],
+                workflow: "Analysis",
+                automation: "AI-Assisted",
+                tools: ["Flow Parser", "Cognitive Model", "Analytics Integration"],
+                keywords: ["user flow", "journey", "friction", "optimization", "conversion"],
+                steps: [
+                    "Input user flow diagram",
+                    "Simulate user interactions",
+                    "Identify friction points",
+                    "Suggest flow optimizations"
+                ]
+            },
+            {
+                id: 4,
+                name: "Prompt-to-Wireframe",
+                description: "Generates low-fidelity wireframes from natural language descriptions using AI understanding of layout patterns and component relationships.",
+                status: "active",
+                tags: ["Wireframing", "Generation", "Prototyping"],
+                workflow: "Generation",
+                automation: "Full Automation",
+                tools: ["AI Layout Engine", "Component Library"],
+                keywords: ["wireframe", "prototype", "layout", "generation", "prompt"],
+                steps: [
+                    "Describe interface in natural language",
+                    "AI generates multiple layout options",
+                    "Refine with feedback",
+                    "Export to design tools"
+                ]
+            },
+            {
+                id: 5,
+                name: "Design System Generator",
+                description: "Creates comprehensive design systems from existing designs, extracting tokens, components, and documentation automatically.",
+                status: "active",
+                tags: ["Design Systems", "Tokens", "Documentation"],
+                workflow: "Generation",
+                automation: "Full Automation",
+                tools: ["Token Extractor", "Component Analyzer", "Doc Generator"],
+                keywords: ["design system", "tokens", "components", "documentation", "style guide"],
+                steps: [
+                    "Analyze design files for patterns",
+                    "Extract design tokens and components",
+                    "Generate documentation",
+                    "Create implementation-ready assets"
+                ]
+            },
+            {
+                id: 6,
+                name: "AI Motion Assistant",
+                description: "Suggests and implements motion design principles for interfaces, creating smooth animations and transitions based on context.",
+                status: "experimental",
+                tags: ["Animation", "Motion Design", "Micro-interactions"],
+                workflow: "Enhancement",
+                automation: "AI-Assisted",
+                tools: ["Motion Library", "Timing Calculator", "Performance Optimizer"],
+                keywords: ["animation", "motion", "transition", "micro-interaction", "timing"],
+                steps: [
+                    "Select interface elements",
+                    "Choose motion intent (delight, guide, feedback)",
+                    "AI suggests appropriate animations",
+                    "Preview and implement"
+                ]
+            },
+            {
+                id: 7,
+                name: "SaaS UX Reviewer",
+                description: "Specialized analysis for SaaS product interfaces focusing on onboarding, feature discovery, and conversion optimization.",
+                status: "beta",
+                tags: ["SaaS", "UX Review", "Conversion"],
+                workflow: "Analysis",
+                automation: "AI-Assisted",
+                tools: ["SaaS Pattern Library", "Conversion Analytics", "Onboarding Flow"],
+                keywords: ["saas", "onboarding", "conversion", "feature discovery", "user adoption"],
+                steps: [
+                    "Input SaaS interface screens",
+                    "Analyze against SaaS best practices",
+                    "Identify conversion blockers",
+                    "Provide prioritized recommendations"
+                ]
+            },
+            {
+                id: 8,
+                name: "Accessibility Checker",
+                description: "Comprehensive accessibility audit tool that goes beyond contrast checking to include screen reader compatibility, keyboard navigation, and ARIA labels.",
+                status: "active",
+                tags: ["Accessibility", "WCAG", "Compliance"],
+                workflow: "Audit",
+                automation: "Full Automation",
+                tools: ["Screen Reader Simulator", "Keyboard Tester", "ARIA Validator"],
+                keywords: ["accessibility", "a11y", "WCAG", "screen reader", "keyboard", "ARIA"],
+                steps: [
+                    "Scan interface for accessibility issues",
+                    "Test with screen reader simulation",
+                    "Validate keyboard navigation",
+                    "Generate compliance report"
+                ]
+            },
+            {
+                id: 9,
+                name: "Token Extractor",
+                description: "Automatically extracts design tokens (colors, typography, spacing, etc.) from any design file and exports to multiple format.",
+                status: "active",
+                tags: ["Design Tokens", "Extraction", "Export"],
+                workflow: "Extraction",
+                automation: "Full Automation",
+                tools: ["Design File Parser", "Token Transformer", "Multi-format Export"],
+                keywords: ["tokens", "extract", "colors", "typography", "spacing", "export"],
+                steps: [
+                    "Upload design file",
+                    "AI identifies and extracts tokens",
+                    "Map to token categories",
+                    "Export to desired format (CSS, JSON, etc.)"
+                ]
+            },
+            {
+                id: 10,
+                name: "Design QA Agent",
+                description: "Automated quality assurance for design implementations, comparing designs to developed interfaces for visual and functional accuracy.",
+                status: "beta",
+                tags: ["QA", "Implementation", "Visual Testing"],
+                workflow: "Validation",
+                automation: "Full Automation",
+                tools: ["Visual Diff Engine", "Implementation Checker", "Bug Tracker"],
+                keywords: ["qa", "quality assurance", "implementation", "visual testing", "pixel perfect"],
+                steps: [
+                    "Compare design mockups to implementation",
+                    "Identify visual and functional discrepancies",
+                    "Generate detailed bug reports",
+                    "Track fixes through resolution"
+                ]
+            }
+        ];
+
+        // 渲染技能卡片
+        function renderSkills() {
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = '';
+
+            skillsData.forEach(skill => {
+                const card = document.createElement('div');
+                card.className = 'skill-card';
+
+                // 状态类
+                let statusClass = '';
+                let statusText = '';
+                switch(skill.status) {
+                    case 'active':
+                        statusClass = 'status-active';
+                        statusText = 'Active';
+                        break;
+                    case 'beta':
+                        statusClass = 'status-beta';
+                        statusText = 'Beta';
+                        break;
+                    case 'experimental':
+                        statusClass = 'status-experimental';
+                        statusText = 'Experimental';
+                        break;
+                }
+
+                // 工具列表
+                const toolsHTML = skill.tools.map(tool => `
+                    <div class="tool-item">
+                        <div class="tool-icon"></div>
+                        <span>${tool}</span>
+                    </div>
+                `).join('');
+
+                // 关键词
+                const keywordsHTML = skill.keywords.map(keyword => `
+                    <span class="keyword">${keyword}</span>
+                `).join('');
+
+                // 步骤
+                const stepsHTML = skill.steps.map((step, index) => `
+                    <li class="step-item">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-text">${step}</div>
+                    </li>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="skill-header">
+                        <div>
+                            <h3 class="skill-title">${skill.name}</h3>
+                            <div class="skill-status ${statusClass}">
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="skill-description">${skill.description}</p>
+
+                    <div class="skill-meta">
+                        <span class="meta-tag workflow">${skill.workflow}</span>
+                        <span class="meta-tag automation">${skill.automation}</span>
+                        ${skill.tags.map(tag => `<span class="meta-tag">${tag}</span>`).join('')}
+                    </div>
+
+                    <div class="skill-details">
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <span>Trigger Keywords</span>
+                            </div>
+                            <div class="detail-content keywords">
+                                ${keywordsHTML}
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <span>Supported Tools</span>
+                            </div>
+                            <div class="detail-content tools-list">
+                                ${toolsHTML}
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <span>Execution Steps</span>
+                            </div>
+                            <div class="detail-content">
+                                <ul class="steps-list">
+                                    ${stepsHTML}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-actions">
+                        <button class="action-button">View Details</button>
+                        <button class="action-button primary">Try Skill</button>
+                    </div>
+                `;
+
+                skillsGrid.appendChild(card);
+            });
+        }
+
+        // 命令面板功能
+        const commandButton = document.getElementById('commandButton');
+        const commandPalette = document.getElementById('commandPalette');
+        const overlay = document.getElementById('overlay');
+        const commandInput = document.querySelector('.command-input');
+
+        function toggleCommandPalette() {
+            commandPalette.classList.toggle('active');
+            overlay.classList.toggle('active');
+            if (commandPalette.classList.contains('active')) {
+                commandInput.focus();
+            }
+        }
+
+        commandButton.addEventListener('click', toggleCommandPalette);
+        overlay.addEventListener('click', toggleCommandPalette);
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleCommandPalette();
+            }
+
+            if (e.key === 'Escape' && commandPalette.classList.contains('active')) {
+                toggleCommandPalette();
+            }
+        });
+
+        // 过滤功能
+        const filterChips = document.querySelectorAll('.filter-chip');
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+
+                // 这里可以添加过滤逻辑
+                const filter = chip.textContent;
+                console.log(`Filtering by: ${filter}`);
+            });
+        });
+
+        // 搜索功能
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+
+            // 这里可以添加搜索逻辑
+            console.log(`Searching for: ${searchTerm}`);
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSkills();
+
+            // 添加一些微交互
+            const skillCards = document.querySelectorAll('.skill-card');
+            skillCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-4px)';
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+
+            // 命令面板项目点击
+            const commandItems = document.querySelectorAll('.command-item');
+            commandItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    console.log(`Command selected: ${item.querySelector('.command-item-title').textContent}`);
+                    toggleCommandPalette();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
